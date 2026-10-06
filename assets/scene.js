@@ -1,0 +1,330 @@
+/* Hermes V11 — scena 3D fissa che accompagna lo scroll (Three.js r170).
+   Preset procedurali (blob, knot, glass, orbits, particles, neon) o modello GLB (Tripo/cliente). */
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
+
+const cfgEl = document.getElementById("hermes-scene");
+const canvas = document.querySelector(".scene3d");
+const cfg = cfgEl ? JSON.parse(cfgEl.textContent) : {};
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const mobile = matchMedia("(max-width: 899px)").matches;
+const css = getComputedStyle(document.documentElement);
+const col = (n) => new THREE.Color(css.getPropertyValue(n).trim() || "#888");
+
+async function main() {
+  if (!canvas) return;
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+  } catch (e) {
+    canvas.remove();
+    return;
+  }
+  const pal = { bg: col("--bg"), fg: col("--fg"), accent: col("--accent"), surface: col("--surface"), muted: col("--muted") };
+  const dark = pal.bg.getHSL({}).l < 0.4;
+  const QA = !!window.__HERMES_QA;  // QA headless: rendering leggero
+  renderer.setPixelRatio(QA ? 0.5 : Math.min(devicePixelRatio || 1, mobile ? 1.25 : 1.6));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = dark ? 1.05 : 1.0;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+  camera.position.set(0, 0, 7);
+  const key = new THREE.DirectionalLight(0xffffff, 1.6);
+  key.position.set(3, 4, 5);
+  const rim = new THREE.DirectionalLight(pal.accent, 2.2);
+  rim.position.set(-4, 1, -3);
+  scene.add(key, rim, new THREE.AmbientLight(0xffffff, 0.25));
+
+  const rig = new THREE.Group();     // posizione guidata dallo scroll
+  const tilt = new THREE.Group();    // parallasse mouse
+  const spin = new THREE.Group();    // rotazione continua
+  rig.add(tilt); tilt.add(spin); scene.add(rig);
+  const uTime = { value: 0 };
+
+  const preset = cfg.preset || "blob";
+  const material = makeMaterial(cfg.material || "chrome", pal, uTime, preset);
+  let object = null;
+
+  if (cfg.model) {
+    try {
+      object = await loadModel(cfg.model, renderer, cfg.material, material);
+    } catch (e) {
+      console.warn("[hermes] modello non caricato, uso il preset", e);
+    }
+  }
+  if (object && preset === "particles") object = toParticles(object, pal, uTime);
+  if (!object) object = buildPreset(preset === "model" ? "blob" : preset, material, pal, uTime);
+  spin.add(object);
+
+  // neon: anello emissivo dietro l'oggetto + bloom
+  let composer = null;
+  if (preset === "neon" && !window.__HERMES_QA) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.07, 32, 220),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.6, 1.6).lerp(pal.accent, 0.15) }));
+    ring.position.z = -1.2;
+    tilt.add(ring);
+    composer = await makeBloom(renderer, scene, camera);
+  }
+
+  // ---------- resize / render ----------
+  const resize = () => {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    composer && composer.setSize(w, h);
+  };
+  resize();
+  addEventListener("resize", resize);
+
+  const mouse = new THREE.Vector2(), smooth = new THREE.Vector2();
+  addEventListener("pointermove", (e) => mouse.set(e.clientX / innerWidth - 0.5, e.clientY / innerHeight - 0.5), { passive: true });
+  let last = performance.now(), frameN = 0;
+  const frame = (now) => {
+    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    if (document.hidden) return;
+    if (QA && (frameN++ % 6)) return;
+    uTime.value += dt;
+    smooth.lerp(mouse, 0.05);
+    tilt.rotation.y = smooth.x * 0.5;
+    tilt.rotation.x = smooth.y * 0.35;
+    if (cfg.model) spin.rotation.y = Math.sin(uTime.value * 0.55) * 0.75; else spin.rotation.y += dt * 0.18;
+    composer ? composer.render() : renderer.render(scene, camera);
+  };
+  if (reduce) { renderer.render(scene, camera); }
+  else renderer.setAnimationLoop(frame);
+  canvas.classList.add("is-live");
+
+  choreograph(rig, spin, renderer, scene, camera);
+}
+
+/* ---------- materiali ---------- */
+function makeMaterial(kind, pal, uTime, preset) {
+  let m;
+  const tint = pal.accent.clone();
+  switch (kind) {
+    case "glass":
+      m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 1, thickness: 1.4, roughness: 0.05, ior: 1.45,
+        iridescence: 0.4, attenuationColor: tint, attenuationDistance: 3, envMapIntensity: 1.3 });
+      break;
+    case "iridescent":
+      m = new THREE.MeshPhysicalMaterial({ color: pal.surface.clone().lerp(new THREE.Color(1, 1, 1), 0.4), metalness: 0.85,
+        roughness: 0.16, iridescence: 1, iridescenceIOR: 1.7, clearcoat: 1 });
+      break;
+    case "matte":
+      m = new THREE.MeshStandardMaterial({ color: tint, roughness: 0.82, metalness: 0 });
+      break;
+    case "gloss":
+      m = new THREE.MeshPhysicalMaterial({ color: tint, roughness: 0.22, metalness: 0.15, clearcoat: 1, clearcoatRoughness: 0.08 });
+      break;
+    default: // chrome
+      m = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(1, 1, 1).lerp(tint, 0.25), metalness: 1, roughness: 0.1, clearcoat: 1 });
+  }
+  if (preset === "neon" && !window.__HERMES_QA) { m.color = new THREE.Color(0.05, 0.05, 0.06); m.metalness = 0.6; m.roughness = 0.18; }
+  return m;
+}
+
+function displace(material, uTime, amp = 0.22) {
+  material.onBeforeCompile = (sh) => {
+    sh.uniforms.uTime = uTime;
+    sh.vertexShader = "uniform float uTime;\n" + NOISE + sh.vertexShader.replace("#include <begin_vertex>",
+      `#include <begin_vertex>
+       float n = snoise(position * 1.1 + vec3(uTime * 0.25));
+       transformed += normal * n * ${amp.toFixed(2)};`);
+  };
+}
+
+/* ---------- preset procedurali ---------- */
+function buildPreset(name, material, pal, uTime) {
+  const g = new THREE.Group();
+  if (name === "blob") {
+    displace(material, uTime);
+    g.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1.3, mobile ? 48 : 96), material));
+  } else if (name === "knot" || name === "neon") {
+    g.add(new THREE.Mesh(new THREE.TorusKnotGeometry(0.95, 0.32, 320, 48, 2, 3), material));
+  } else if (name === "glass") {
+    g.add(new THREE.Mesh(new THREE.TorusKnotGeometry(0.95, 0.36, 300, 48, 2, 3), material));
+    // forme colorate dietro il vetro: danno qualcosa da rifrangere
+    [[pal.accent, -1.1, 0.6, 0.65], [pal.surface, 1.2, -0.5, 0.5], [pal.fg, 0.2, -1.1, 0.28]].forEach(([c, x, y, r]) => {
+      const s = new THREE.Mesh(new THREE.SphereGeometry(r, 48, 48), new THREE.MeshStandardMaterial({ color: c, roughness: 0.4 }));
+      s.position.set(x, y, -1.6); g.add(s);
+    });
+  } else if (name === "orbits") {
+    const core = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 96),
+      new THREE.MeshPhysicalMaterial({ color: pal.accent, roughness: 0.18, clearcoat: 1, sheen: 0.5 }));
+    g.add(core);
+    const lineMat = new THREE.LineBasicMaterial({ color: pal.fg, transparent: true, opacity: 0.35 });
+    [[1.7, 0.45, 0.2], [2.2, 1.1, -0.4], [1.45, -0.6, 1.2]].forEach(([r, rx, rz], i) => {
+      const curve = new THREE.EllipseCurve(0, 0, r, r * 0.92);
+      const line = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(curve.getPoints(160)), lineMat);
+      line.rotation.set(Math.PI / 2 + rx, 0, rz);
+      g.add(line);
+      const moon = new THREE.Mesh(new THREE.SphereGeometry(0.14 + i * 0.05, 32, 32),
+        new THREE.MeshPhysicalMaterial({ color: i % 2 ? pal.surface : pal.fg, roughness: 0.25, clearcoat: 1 }));
+      moon.userData = { r, rx, rz, speed: 0.3 + i * 0.17, phase: i * 2 };
+      g.add(moon);
+    });
+    g.onBeforeRender = () => {};
+    const moons = g.children.filter((c) => c.userData.r);
+    const tick = () => {
+      const t = performance.now() / 1000;
+      moons.forEach((m) => {
+        const a = t * m.userData.speed + m.userData.phase;
+        const v = new THREE.Vector3(Math.cos(a) * m.userData.r, 0, Math.sin(a) * m.userData.r * 0.92);
+        v.applyEuler(new THREE.Euler(m.userData.rx, 0, m.userData.rz));
+        m.position.copy(v);
+      });
+      if (!reduce) requestAnimationFrame(tick);
+    };
+    tick();
+  } else if (name === "particles") {
+    return toParticles(new THREE.Mesh(new THREE.TorusKnotGeometry(1, 0.38, 260, 40, 2, 3)), pal, uTime);
+  }
+  return g;
+}
+
+function toParticles(object, pal, uTime) {
+  const meshes = [];
+  object.traverse((o) => o.isMesh && meshes.push(o));
+  const count = mobile ? 9000 : 22000;
+  const pos = new Float32Array(count * 3), seed = new Float32Array(count);
+  const tmp = new THREE.Vector3();
+  object.updateMatrixWorld(true);
+  const per = Math.ceil(count / Math.max(1, meshes.length));
+  let k = 0;
+  for (const m of meshes) {
+    const s = new MeshSurfaceSampler(m).build();
+    for (let i = 0; i < per && k < count; i++, k++) {
+      s.sample(tmp); tmp.applyMatrix4(m.matrixWorld);
+      pos.set([tmp.x, tmp.y, tmp.z], k * 3); seed[k] = Math.random();
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute("aSeed", new THREE.BufferAttribute(seed, 1));
+  const mat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false,
+    uniforms: { uTime, uColor: { value: pal.fg }, uAccent: { value: pal.accent }, uSize: { value: (mobile ? 2.2 : 2.6) * Math.min(devicePixelRatio, 2) } },
+    vertexShader: `uniform float uTime; uniform float uSize; attribute float aSeed; varying float vSeed;
+      void main(){ vSeed = aSeed; vec3 p = position;
+        p += normalize(p + 0.001) * sin(uTime * 0.8 + aSeed * 6.2831) * 0.025;
+        vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv;
+        gl_PointSize = uSize * (0.6 + aSeed * 0.8) * (6.0 / -mv.z); }`,
+    fragmentShader: `uniform vec3 uColor; uniform vec3 uAccent; varying float vSeed;
+      void main(){ vec2 c = gl_PointCoord - 0.5; if (length(c) > 0.5) discard;
+        gl_FragColor = vec4(mix(uColor, uAccent, step(0.93, vSeed)), 0.85); }`,
+  });
+  const pts = new THREE.Points(geo, mat);
+  const g = new THREE.Group(); g.add(pts);
+  return g;
+}
+
+/* ---------- modello GLB (Draco + Meshopt per i modelli Tripo) ---------- */
+async function loadModel(url, renderer, matKind, fallbackMat) {
+  const [{ GLTFLoader }, { DRACOLoader }, { MeshoptDecoder }] = await Promise.all([
+    import("three/addons/loaders/GLTFLoader.js"), import("three/addons/loaders/DRACOLoader.js"),
+    import("three/addons/libs/meshopt_decoder.module.js")]);
+  const loader = new GLTFLoader();
+  const draco = new DRACOLoader().setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.6/");
+  loader.setDRACOLoader(draco);
+  loader.setMeshoptDecoder(MeshoptDecoder);
+  const gltf = await loader.loadAsync(url);
+  const root = gltf.scene;
+  const box = new THREE.Box3().setFromObject(root);
+  const size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
+  root.position.sub(center);
+  const s = 2.6 / Math.max(size.x, size.y, size.z);
+  const wrap = new THREE.Group();
+  wrap.scale.setScalar(s);
+  wrap.add(root);
+  {  // oggetto piatto (pizza, medaglia): porta la faccia verso la camera
+    const mx = Math.max(size.x, size.y, size.z), mn = Math.min(size.x, size.y, size.z);
+    if (mn < 0.45 * mx) {
+      if (mn === size.y) wrap.rotation.x = Math.PI / 2;
+      else if (mn === size.x) wrap.rotation.y = -Math.PI / 2;
+    }
+  }
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    o.frustumCulled = false;  // niente stutter quando entra in camera
+    if (matKind && matKind !== "original") o.material = fallbackMat;
+  });
+  return wrap;
+}
+
+async function makeBloom(renderer, scene, camera) {
+  try {
+    const [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }] = await Promise.all([
+      import("three/addons/postprocessing/EffectComposer.js"), import("three/addons/postprocessing/RenderPass.js"),
+      import("three/addons/postprocessing/UnrealBloomPass.js"), import("three/addons/postprocessing/OutputPass.js")]);
+    const rt = new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type: THREE.HalfFloatType, samples: 4 });
+    const c = new EffectComposer(renderer, rt);
+    c.addPass(new RenderPass(scene, camera));
+    c.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.9, 0.6, 0.85));
+    c.addPass(new OutputPass());
+    return c;
+  } catch (e) {
+    console.warn("[hermes] bloom non disponibile", e);
+    return null;
+  }
+}
+
+/* ---------- coreografia: l'oggetto si sposta tra le sezioni ---------- */
+function choreograph(rig, spin, renderer, scene, camera) {
+  const start = () => {
+    const gsap = window.gsap, ST = window.ScrollTrigger;
+    if (!gsap || !ST) return;
+    const root = document.documentElement;
+    const setO = (o) => gsap.to(root, { "--scene-o": o, duration: 0.9, ease: "power2.out", overwrite: true });
+    const targets = (cfg.sections || []).map((s, i) => {
+      const stage = s.type === "scene_moment" || i === 0 || (!!cfg.model && s.type === "text_reveal");
+      const side = i % 2 ? -1 : 1;
+      if (mobile) return stage ? { x: 0, y: i === 0 ? 0.55 : 0.9, s: i === 0 ? 0.78 : 0.85, o: i === 0 ? 0.6 : 1 }
+                              : { x: side * 1.6, y: 0.4, s: 0.5, o: 0.16 };
+      return stage ? { x: i === 0 ? 1.55 : 1.45, y: 0, s: 1, o: 1 } : { x: side * 3.0, y: -0.2, s: 0.62, o: 0.3 };
+    });
+    const go = (t) => {
+      gsap.to(rig.position, { x: t.x, y: t.y, duration: 1.6, ease: "expo.inOut", overwrite: true });
+      gsap.to(rig.scale, { x: t.s, y: t.s, z: t.s, duration: 1.6, ease: "expo.inOut", overwrite: true });
+      setO(t.o);
+    };
+    (cfg.sections || []).forEach((s, i) => {
+      const el = document.getElementById(s.id);
+      if (!el) return;
+      ST.create({ trigger: el, start: "top 55%", end: "bottom 45%", onToggle: (self) => self.isActive && go(targets[i]) });
+    });
+    if (targets[0]) { rig.position.set(targets[0].x, targets[0].y, 0); rig.scale.setScalar(targets[0].s); setO(targets[0].o); }
+    // rotazione legata allo scroll totale
+    ST.create({ start: 0, end: "max", onUpdate: (self) => { rig.rotation.y = cfg.model ? Math.sin(self.progress * Math.PI * 4) * 0.45 : self.progress * Math.PI * 2.2; rig.rotation.x = cfg.model ? 0.12 : Math.sin(self.progress * Math.PI) * 0.3; } });
+  };
+  if (window.__hermesReady) start();
+  else {
+    const t = setInterval(() => { if (window.__hermesReady) { clearInterval(t); start(); } }, 120);
+    setTimeout(() => clearInterval(t), 10000);
+  }
+}
+
+const NOISE = `
+vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+float snoise(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1.0,2.0);
+vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.0-g;
+vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+C.yyy;vec3 x3=x0-D.yyy;
+i=mod289(i);vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+float n_=0.142857142857;vec3 ns=n_*D.wyz-D.xzx;vec4 j=p-49.0*floor(p*ns.z*ns.z);vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.0*x_);
+vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;vec4 h=1.0-abs(x)-abs(y);vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);
+vec4 s0=floor(b0)*2.0+1.0;vec4 s1=floor(b1)*2.0+1.0;vec4 sh=-step(h,vec4(0.0));vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
+vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);m=m*m;
+return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));}
+`;
+
+main().catch((e) => console.warn("[hermes] scena 3D disattivata:", e));

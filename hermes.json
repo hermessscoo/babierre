@@ -1,0 +1,241 @@
+{
+ "version": 11,
+ "raw": {
+  "repo_name": "babierre",
+  "brand": {
+   "name": "Babierre",
+   "tagline": "Caffè, cultura e convivialità",
+   "sector_en": "coffee shop",
+   "mission": "Offriamo un luogo accogliente dove gustare caffè di qualità e condividere momenti di cultura. Ogni dettaglio è pensato per stimolare i sensi e creare connessioni.",
+   "keywords": [
+    "accogliente",
+    "autentico",
+    "creativo",
+    "sostenibile",
+    "vibrante"
+   ],
+   "palette": {
+    "bg": "#f3f1ec",
+    "fg": "#141a2b",
+    "accent": "#2c4a7a",
+    "muted": "#626a7a",
+    "surface": "#e3e1da"
+   },
+   "font_display": "Fraunces",
+   "font_body": "Manrope",
+   "art_direction": "soft natural light, warm tones, subtle grain"
+  },
+  "seo": {
+   "description": "Babierre, il caffè dove il gusto incontra la cultura. Scopri il nostro spazio accogliente, il menu artigianale e gli eventi che animano la città."
+  },
+  "nav_cta": {
+   "label": "Prenota",
+   "href": "#contatti"
+  },
+  "contact": {
+   "email": "",
+   "phone": "",
+   "address": "",
+   "hours": ""
+  },
+  "sections": [
+   {
+    "type": "hero_image",
+    "eyebrow": "*Benvenuti*",
+    "title": "*Babierre* – Il tuo angolo di cultura",
+    "subtitle": "Caffè artigianale, letture, musica dal vivo",
+    "cta": {
+     "label": "Scopri di più",
+     "href": "#chi-siamo"
+    },
+    "image": "cozy coffee shop interior, warm natural light, wooden tables, vintage books, subtle grain"
+   },
+   {
+    "type": "text_reveal",
+    "kicker": "La nostra filosofia",
+    "text": "Crediamo che un buon caffè sia il punto di partenza per conversazioni sincere, idee che nascono e ricordi che si costruiscono. Ogni tazza è preparata con cura, ogni spazio è pensato per ispirare."
+   },
+   {
+    "type": "horizontal_gallery",
+    "kicker": "Sapori in mostra",
+    "title": "*Il Menu*",
+    "items": [
+     {
+      "title": "Espresso Classico",
+      "caption": "Intenso e vellutato",
+      "image": "espresso shot, close-up, dark background, soft rim light"
+     },
+     {
+      "title": "Cappuccino Artigianale",
+      "caption": "Latte cremoso e schiuma perfetta",
+      "image": "cappuccino cup, latte art heart, warm light"
+     },
+     {
+      "title": "Torta al Limone",
+      "caption": "Dolce freschezza agrumata",
+      "image": "lemon cake slice, rustic plate, natural light"
+     },
+     {
+      "title": "Panino Vegano",
+      "caption": "Verdure grigliate e hummus",
+      "image": "vegan sandwich, whole grain bread, fresh herbs"
+     }
+    ]
+   },
+   {
+    "type": "stacked_cards",
+    "kicker": "Il nostro percorso",
+    "title": "*Dalla torrefazione alla tazza*",
+    "items": [
+     {
+      "tag": "01",
+      "title": "Selezione",
+      "text": "Scegliamo solo chicchi di alta qualità, provenienti da coltivazioni sostenibili.",
+      "image": "coffee beans selection, wooden crate, soft daylight"
+     },
+     {
+      "tag": "02",
+      "title": "Torrefazione",
+      "text": "Torrefiamo in piccoli lotti per preservare aromi e sapori unici.",
+      "image": "coffee roaster, amber glow, industrial chic"
+     },
+     {
+      "tag": "03",
+      "title": "Preparazione",
+      "text": "Baristi esperti estraggono la perfezione in ogni tazza.",
+      "image": "barista pouring espresso, close-up, steam"
+     }
+    ]
+   },
+   {
+    "type": "split",
+    "kicker": "Atmosfera",
+    "title": "*Spazio & Stile*",
+    "text": "Un design che combina elementi vintage e moderni, creando un ambiente dove il tempo sembra rallentare.",
+    "bullets": [
+     "Luce naturale",
+     "Arredi in legno recuperato",
+     "Musica acustica selezionata"
+    ],
+    "image": "cozy coffee shop corner, vintage armchair, soft daylight, subtle shadows",
+    "reverse": false
+   },
+   {
+    "type": "marquee",
+    "items": [
+     "caffè",
+     "arte",
+     "musica",
+     "lettura",
+     "incontro",
+     "creatività"
+    ]
+   },
+   {
+    "type": "stats",
+    "kicker": "Numeri che parlano",
+    "title": "*Il nostro impatto*",
+    "items": [
+     {
+      "value": 150,
+      "prefix": "",
+      "suffix": "+",
+      "label": "Giorni di apertura"
+     },
+     {
+      "value": 5000,
+      "prefix": "",
+      "suffix": "+",
+      "label": "Tazze servite"
+     },
+     {
+      "value": 100,
+      "prefix": "",
+      "suffix": "%",
+      "label": "Ingredienti locali"
+     }
+    ]
+   },
+   {
+    "type": "services",
+    "kicker": "Eventi",
+    "title": "*Cultura in azione*",
+    "items": [
+     {
+      "title": "Serate di lettura",
+      "text": "Incontri con autori emergenti e discussioni letterarie.",
+      "image": "people reading poetry, intimate lighting, coffee tables"
+     },
+     {
+      "title": "Live Music",
+      "text": "Performance acustiche di talenti locali ogni weekend.",
+      "image": "acoustic guitarist on stage, warm spotlights"
+     },
+     {
+      "title": "Workshop Creativi",
+      "text": "Laboratori di scrittura, disegno e fotografia.",
+      "image": "creative workshop, participants, natural light"
+     }
+    ]
+   },
+   {
+    "type": "scene_moment",
+    "kicker": "Il nostro punto di forza",
+    "title": "*Il Moka Vintage*",
+    "text": "Un'icona di design che accompagna il tuo caffè, simbolo di tradizione e artigianalità."
+   },
+   {
+    "type": "cta",
+    "title": "*Vieni a trovarci*",
+    "text": "Scopri il gusto della cultura. Prenota il tuo tavolo o semplicemente passa a salutare.",
+    "cta": {
+     "label": "Contattaci",
+     "href": "#contatti"
+    }
+   }
+  ],
+  "experience": {
+   "mode": "classic",
+   "preset": "",
+   "material": "",
+   "model_prompt": "",
+   "intro": "counter",
+   "chapters": [
+    "GUSTO",
+    "ATMOSFERA",
+    "COMUNITÀ"
+   ],
+   "index": false
+  },
+  "todo": [
+   "Fornire indirizzo completo e orari di apertura",
+   "Inserire email e numero di telefono per contatti",
+   "Confermare palette di colori in linea con logo",
+   "Fornire foto ad alta risoluzione per hero e gallery",
+   "Confermare eventuali testi per le sezioni eventi"
+  ]
+ },
+ "logo": {
+  "src": "assets/logo.png",
+  "filter": "",
+  "w": 676,
+  "h": 218
+ },
+ "favicon": null,
+ "model": null,
+ "video": null,
+ "images": {
+  "d6683e951193": "assets/img/d6683e951193.webp",
+  "6e644cee26dd": "assets/img/6e644cee26dd.webp",
+  "a0e8696130c7": "assets/img/a0e8696130c7.webp",
+  "0ed18693fd67": "assets/img/0ed18693fd67.webp",
+  "38a0cba47bd6": "assets/img/38a0cba47bd6.webp",
+  "5a7e23b949eb": "assets/img/5a7e23b949eb.webp",
+  "1e9869784e67": "assets/img/1e9869784e67.webp",
+  "35193157d079": "assets/img/35193157d079.webp",
+  "bce28bc713d0": "assets/img/bce28bc713d0.webp",
+  "4e03298ae153": "assets/img/4e03298ae153.webp",
+  "f351646d3a58": "assets/img/f351646d3a58.webp",
+  "8af47befbeb7": "assets/img/8af47befbeb7.webp"
+ }
+}
