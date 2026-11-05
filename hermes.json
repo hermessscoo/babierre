@@ -26,7 +26,7 @@
    "art_direction": "soft natural light, warm tones, subtle grain"
   },
   "seo": {
-   "description": "Babierre, il caffè dove il gusto incontra la cultura. Scopri il nostro spazio accogliente, il menu artigianale e gli eventi che animano la città."
+   "description": "Babierre: caffè artigianale, libri e musica dal vivo. Scopri il menu, le serate in programma e prenota il tuo tavolo."
   },
   "nav_cta": {
    "label": "Prenota",
@@ -42,18 +42,95 @@
    {
     "type": "hero_image",
     "eyebrow": "*Benvenuti*",
-    "title": "*Babierre* – Il tuo angolo di cultura",
-    "subtitle": "Caffè artigianale, letture, musica dal vivo",
+    "title": "Il caffè dove ti fermi *davvero*",
+    "subtitle": "Caffè artigianale, libri, musica dal vivo. Il tuo angolo in città.",
     "cta": {
-     "label": "Scopri di più",
+     "label": "Prenota un tavolo",
      "href": "#chi-siamo"
     },
-    "image": "cozy coffee shop interior, warm natural light, wooden tables, vintage books, subtle grain"
+    "image": "cozy coffee shop interior, warm natural light, wooden tables, vintage books, subtle grain",
+    "role": "attenzione"
    },
    {
     "type": "text_reveal",
-    "kicker": "La nostra filosofia",
-    "text": "Crediamo che un buon caffè sia il punto di partenza per conversazioni sincere, idee che nascono e ricordi che si costruiscono. Ogni tazza è preparata con cura, ogni spazio è pensato per ispirare."
+    "kicker": "Il problema",
+    "text": "Le pause caffè sono diventate un gesto veloce, in piedi, con un occhio al telefono. Cerchi un posto dove sederti, parlare senza fretta e sentirti a casa, e finisci sempre nello stesso bar di passaggio. Una buona tazza merita un posto che ti lasci il tempo di gustarla.",
+    "role": "problema"
+   },
+   {
+    "type": "stacked_cards",
+    "kicker": "Come lavoriamo",
+    "title": "Dalla *selezione* alla tazza",
+    "items": [
+     {
+      "tag": "01",
+      "title": "Selezione",
+      "text": "Scegliamo solo chicchi di alta qualità, provenienti da coltivazioni sostenibili.",
+      "image": "coffee beans selection, wooden crate, soft daylight"
+     },
+     {
+      "tag": "02",
+      "title": "Torrefazione",
+      "text": "Torrefiamo in piccoli lotti per preservare aromi e sapori unici.",
+      "image": "coffee roaster, amber glow, industrial chic"
+     },
+     {
+      "tag": "03",
+      "title": "Preparazione",
+      "text": "Baristi esperti estraggono la perfezione in ogni tazza.",
+      "image": "barista pouring espresso, close-up, steam"
+     }
+    ],
+    "role": "soluzione"
+   },
+   {
+    "type": "offer",
+    "role": "offerta",
+    "kicker": "L'offerta",
+    "title": "Un tavolo, un caffè, il tempo che *serve*",
+    "text": "Tutto quello che trovi da Babierre in un posto solo.",
+    "points": [
+     "Caffè artigianale e dolci preparati con cura",
+     "Un ambiente dove leggere, chiacchierare o fermarsi",
+     "Serate di lettura, musica dal vivo e workshop",
+     "Prenotare un tavolo è semplice"
+    ],
+    "price": "",
+    "note": "Scrivici e ti teniamo il tavolo.",
+    "cta": {
+     "label": "Prenota un tavolo",
+     "href": "#contatti"
+    }
+   },
+   {
+    "type": "split",
+    "kicker": "Perché Babierre",
+    "title": "Uno spazio che rallenta il *tempo*",
+    "text": "Un design che combina elementi vintage e moderni, creando un ambiente dove il tempo sembra rallentare.",
+    "bullets": [
+     "Luce naturale",
+     "Arredi in legno recuperato",
+     "Musica acustica selezionata"
+    ],
+    "image": "cozy coffee shop corner, vintage armchair, soft daylight, subtle shadows",
+    "reverse": false,
+    "role": "usp"
+   },
+   {
+    "type": "stats",
+    "role": "prova",
+    "kicker": "In cifre",
+    "title": "Cosa trovi *da noi*",
+    "items": [
+     {
+      "value": 3,
+      "label": "tipi di serate in programma"
+     },
+     {
+      "value": 4,
+      "label": "proposte in evidenza nel menu"
+     }
+    ]
    },
    {
     "type": "horizontal_gallery",
@@ -80,81 +157,9 @@
       "caption": "Verdure grigliate e hummus",
       "image": "vegan sandwich, whole grain bread, fresh herbs"
      }
-    ]
-   },
-   {
-    "type": "stacked_cards",
-    "kicker": "Il nostro percorso",
-    "title": "*Dalla torrefazione alla tazza*",
-    "items": [
-     {
-      "tag": "01",
-      "title": "Selezione",
-      "text": "Scegliamo solo chicchi di alta qualità, provenienti da coltivazioni sostenibili.",
-      "image": "coffee beans selection, wooden crate, soft daylight"
-     },
-     {
-      "tag": "02",
-      "title": "Torrefazione",
-      "text": "Torrefiamo in piccoli lotti per preservare aromi e sapori unici.",
-      "image": "coffee roaster, amber glow, industrial chic"
-     },
-     {
-      "tag": "03",
-      "title": "Preparazione",
-      "text": "Baristi esperti estraggono la perfezione in ogni tazza.",
-      "image": "barista pouring espresso, close-up, steam"
-     }
-    ]
-   },
-   {
-    "type": "split",
-    "kicker": "Atmosfera",
-    "title": "*Spazio & Stile*",
-    "text": "Un design che combina elementi vintage e moderni, creando un ambiente dove il tempo sembra rallentare.",
-    "bullets": [
-     "Luce naturale",
-     "Arredi in legno recuperato",
-     "Musica acustica selezionata"
     ],
-    "image": "cozy coffee shop corner, vintage armchair, soft daylight, subtle shadows",
-    "reverse": false
-   },
-   {
-    "type": "marquee",
-    "items": [
-     "caffè",
-     "arte",
-     "musica",
-     "lettura",
-     "incontro",
-     "creatività"
-    ]
-   },
-   {
-    "type": "stats",
-    "kicker": "Numeri che parlano",
-    "title": "*Il nostro impatto*",
-    "items": [
-     {
-      "value": 150,
-      "prefix": "",
-      "suffix": "+",
-      "label": "Giorni di apertura"
-     },
-     {
-      "value": 5000,
-      "prefix": "",
-      "suffix": "+",
-      "label": "Tazze servite"
-     },
-     {
-      "value": 100,
-      "prefix": "",
-      "suffix": "%",
-      "label": "Ingredienti locali"
-     }
-    ]
+    "role": "extra",
+    "extra_why": "il locale vende caffè e dolci: serve il menu in evidenza"
    },
    {
     "type": "services",
@@ -176,22 +181,43 @@
       "text": "Laboratori di scrittura, disegno e fotografia.",
       "image": "creative workshop, participants, natural light"
      }
-    ]
-   },
-   {
-    "type": "scene_moment",
-    "kicker": "Il nostro punto di forza",
-    "title": "*Il Moka Vintage*",
-    "text": "Un'icona di design che accompagna il tuo caffè, simbolo di tradizione e artigianalità."
+    ],
+    "role": "extra",
+    "extra_why": "il locale organizza serate di lettura, musica dal vivo e workshop"
    },
    {
     "type": "cta",
-    "title": "*Vieni a trovarci*",
-    "text": "Scopri il gusto della cultura. Prenota il tuo tavolo o semplicemente passa a salutare.",
+    "title": "Il tuo tavolo ti *aspetta*",
+    "text": "Prenota e vieni a fare una pausa vera.",
     "cta": {
-     "label": "Contattaci",
+     "label": "Prenota un tavolo",
      "href": "#contatti"
-    }
+    },
+    "role": "cta"
+   },
+   {
+    "type": "faq",
+    "role": "faq",
+    "kicker": "Domande",
+    "title": "Prima di *passare*",
+    "items": [
+     {
+      "q": "Che cosa organizzate oltre al caffè?",
+      "a": "Serate di lettura, musica dal vivo e workshop creativi."
+     },
+     {
+      "q": "Posso fermarmi a leggere o a lavorare?",
+      "a": "Sì: lo spazio è pensato per rallentare, con luce naturale e musica acustica."
+     },
+     {
+      "q": "Come prenoto un tavolo?",
+      "a": "Dal pulsante in fondo alla pagina."
+     },
+     {
+      "q": "Il menu cambia?",
+      "a": "Qui trovi le proposte in evidenza; per tutto il resto chiedi in sala."
+     }
+    ]
    }
   ],
   "experience": {
@@ -212,7 +238,10 @@
    "Inserire email e numero di telefono per contatti",
    "Confermare palette di colori in linea con logo",
    "Fornire foto ad alta risoluzione per hero e gallery",
-   "Confermare eventuali testi per le sezioni eventi"
+   "Confermare eventuali testi per le sezioni eventi",
+   "Sostituire la sezione prova con recensioni reali (es. Google) appena disponibili",
+   "Verificare con il titolare i testi del percorso (torrefazione, ingredienti locali) prima di tenerli",
+   "Inserire email, telefono, indirizzo e orari: la prenotazione ora rimanda a #contatti senza recapiti"
   ]
  },
  "logo": {
@@ -226,14 +255,14 @@
  "video": null,
  "images": {
   "d6683e951193": "assets/img/d6683e951193.webp",
-  "6e644cee26dd": "assets/img/6e644cee26dd.webp",
-  "a0e8696130c7": "assets/img/a0e8696130c7.webp",
-  "0ed18693fd67": "assets/img/0ed18693fd67.webp",
-  "38a0cba47bd6": "assets/img/38a0cba47bd6.webp",
   "5a7e23b949eb": "assets/img/5a7e23b949eb.webp",
   "1e9869784e67": "assets/img/1e9869784e67.webp",
   "35193157d079": "assets/img/35193157d079.webp",
   "bce28bc713d0": "assets/img/bce28bc713d0.webp",
+  "6e644cee26dd": "assets/img/6e644cee26dd.webp",
+  "a0e8696130c7": "assets/img/a0e8696130c7.webp",
+  "0ed18693fd67": "assets/img/0ed18693fd67.webp",
+  "38a0cba47bd6": "assets/img/38a0cba47bd6.webp",
   "4e03298ae153": "assets/img/4e03298ae153.webp",
   "f351646d3a58": "assets/img/f351646d3a58.webp",
   "8af47befbeb7": "assets/img/8af47befbeb7.webp"
